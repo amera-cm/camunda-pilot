@@ -11,9 +11,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/app")
 @ParametersAreNonnullByDefault
 public class Api {
 
@@ -27,7 +29,7 @@ public class Api {
     this.applicationContext = applicationContext;
   }
 
-  @GetMapping("/")
+  @GetMapping("/api/protected")
   public String index(@AuthenticationPrincipal Jwt jwt, Authentication auth) {
     logger.info(auth.getPrincipal());
     auth.getAuthorities().forEach(logger::info);
@@ -35,14 +37,14 @@ public class Api {
     return String.format("Hello, %s!", jwt.getClaimAsString("preferred_username"));
   }
 
-  @GetMapping("/protected/premium")
+  @GetMapping("/api/premium")
   public String premium(@AuthenticationPrincipal Jwt jwt, Authentication auth) {
     logger.info(auth.getPrincipal());
     auth.getAuthorities().forEach(logger::info);
     return String.format("Hello, %s!", jwt.getClaimAsString("preferred_username"));
   }
 
-  @GetMapping("/admin")
+  @GetMapping("/api/admin")
   public Map<String, Object> admin(@AuthenticationPrincipal Jwt jwt) {
     final var kc = applicationContext.getBean(Keycloak.class);
     final var realm = kc.realm(iamConfigData.getRealm());

@@ -1,5 +1,6 @@
 package io.cmt.camunda_pilot.spring;
 
+import io.cmt.camunda_pilot.spring.security.PolicyEnforcerFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +11,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.keycloak.OAuth2Constants;
-import org.keycloak.adapters.authorization.integration.jakarta.ServletPolicyEnforcerFilter;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.representations.adapters.config.PolicyEnforcerConfig;
@@ -39,7 +39,6 @@ public class SecurityConfig {
 
   private static final String REALM_ACCESS_CLAIM = "realm_access";
   private static final String ROLES_CLAIM = "roles";
-  private static final String GROUPS_CLAIM = "groups";
   private static final String SCOPE_CLAIM = "scope";
 
   @Bean
@@ -50,13 +49,15 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(
-      HttpSecurity http, IamConfigData configData, ClientRegistration keycloak) throws Exception {
-    http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
+      HttpSecurity http, IamConfigData configData, ClientRegistration kgReg, Keycloak kcAdmin)
+      throws Exception {
+    http.authorizeHttpRequests(
+            authorize ->
+                authorize.requestMatchers("/public/**").permitAll().anyRequest().authenticated())
         .oauth2ResourceServer(
             cfg -> cfg.jwt(jwt -> jwt.jwtAuthenticationConverter(new JwtAuthenticationConverter())))
         .addFilterAfter(
-            createPolicyEnforcerFilter(configData, keycloak),
-            BearerTokenAuthenticationFilter.class);
+            createPolicyEnforcerFilter(configData, kgReg), BearerTokenAuthenticationFilter.class);
     return http.build();
   }
 
@@ -79,14 +80,14 @@ public class SecurityConfig {
   }
 
   @Nonnull
-  private ServletPolicyEnforcerFilter createPolicyEnforcerFilter(
-      IamConfigData configData, ClientRegistration keycloak) {
+  private PolicyEnforcerFilter createPolicyEnforcerFilter(
+      IamConfigData configData, ClientRegistration kcReg) {
     final var config = new PolicyEnforcerConfig();
     config.setRealm(configData.getRealm());
     config.setAuthServerUrl(configData.getAuthServerUrl());
-    config.setResource(keycloak.getClientId());
-    config.setCredentials(Map.of("secret", keycloak.getClientSecret()));
-    return new ServletPolicyEnforcerFilter(request -> config);
+    config.setResource(kcReg.getClientId());
+    config.setCredentials(Map.of("secret", kcReg.getClientSecret()));
+    return new PolicyEnforcerFilter(request -> config, "/public/**");
   }
 
   @ParametersAreNonnullByDefault
@@ -100,10 +101,6 @@ public class SecurityConfig {
         final var realmAccess = jwt.getClaimAsMap(REALM_ACCESS_CLAIM);
         final var roles = (List<String>) realmAccess.get(ROLES_CLAIM);
         authorities.addAll(fromAuthNames(roles, "ROLE_"));
-      }
-      if (jwt.hasClaim(GROUPS_CLAIM)) {
-        final var groups = jwt.getClaimAsStringList(GROUPS_CLAIM);
-        authorities.addAll(fromAuthNames(groups, "GROUP_"));
       }
       if (jwt.hasClaim(SCOPE_CLAIM)) {
         final var scopes = Arrays.asList(jwt.getClaimAsString(SCOPE_CLAIM).split(" "));
