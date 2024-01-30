@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<head lang="en" th:replace="layout :: head">
+</head>
+<body>
+<div th:replace="layout :: pageHeader"></div>
+
+<div class="container-md">
+    <h1>Home Page</h1>
+    <ul>
+        <li>Name: <span th:text="${name}"></span></li>
+        <li>Username: <span th:text="${username}"></span></li>
+        <li>Email: <span th:text="${email}"></span></li>
+        <li>Authorities: <span th:text="${authorities}"></span></li>
+        <li></li>
+        <li><a class="btn btn-warning" href="/logout" role="button">Logout</a></li>
+    </ul>
+</div>
+
+<th:block th:include="layout :: beforeBodyClose"/>
+</body>
+</html>
