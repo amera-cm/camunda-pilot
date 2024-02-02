@@ -1,0 +1,4 @@
+vaadin:
+  url-mapping: /ui/*
+  exclude-urls: /api/**
+

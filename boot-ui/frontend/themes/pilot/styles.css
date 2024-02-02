@@ -1,0 +1,14 @@
+
+a.secondaryNavLink[highlight] {
+    font-weight: bold;
+}
+
+vaadin-side-nav-item.highlight::part(content) {
+    background-color: var(--lumo-primary-color-10pct);
+    color: var(--vaadin-selection-color-text, var(--lumo-primary-text-color));
+    border-radius: var(--lumo-border-radius-m);
+}
+
+vaadin-side-nav-item.highlight vaadin-icon {
+    color: var(--vaadin-selection-color-text, var(--lumo-primary-text-color));
+}

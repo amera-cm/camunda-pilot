@@ -8,6 +8,7 @@ lombok = "1.18.30"
 spotbugs-annotations = "4.8.3"
 spotbugs-gradle-plugin = "6.0.6"
 spring-boot = "3.1.7"
+vaadin = "24.3.3"
 
 [libraries]
 checkstyle = { module = "com.puppycrawl.tools:checkstyle", version.ref = "checkstyle" }
@@ -21,5 +22,7 @@ spotbugs-plugin-lib = { module = "com.github.spotbugs.snom:spotbugs-gradle-plugi
 spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
 spring-plugin-boot-lib = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
 spring-plugin-dependencies-lib = { module = "io.spring.gradle:dependency-management-plugin", version.ref = "dependency-management-plugin" }
+vaadin-bom = { module = "com.vaadin:vaadin-bom", version.ref = "vaadin" }
 
 [plugins]
+vaadin-plugin = { id = "com.vaadin", version.ref = "vaadin" }
