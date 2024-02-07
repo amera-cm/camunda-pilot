@@ -6,9 +6,11 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import io.cmt.camunda_pilot.boot.ui.events.UpdateRootHeadViewTitleEvent;
+import jakarta.annotation.security.RolesAllowed;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@RolesAllowed({"USER_PREMIUM"})
 @Route(value = "superusers", layout = DashboardRouterLayout.class)
 public class DashboardSuperUsersView extends VerticalLayout {
 

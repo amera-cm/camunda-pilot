@@ -1,3 +1,22 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: authz-servlet
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+            client-secret: <set as env var SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENTSECRET>
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/quickstart
+
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/quickstart
+
 vaadin:
   url-mapping: /ui/*
   exclude-urls: /api/**

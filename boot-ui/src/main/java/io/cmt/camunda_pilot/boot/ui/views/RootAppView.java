@@ -16,14 +16,21 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import io.cmt.camunda_pilot.boot.adapters.SecurityAdapter;
 import io.cmt.camunda_pilot.boot.ui.components.MySideNavItem;
 import io.cmt.camunda_pilot.boot.ui.components.RootHeadViewTitle;
+import io.cmt.camunda_pilot.boot.ui.components.UserMenuBar;
+import jakarta.annotation.security.PermitAll;
 
+@PermitAll
 @PageTitle("Camunda Pilot")
 @Route("")
 public class RootAppView extends AppLayout {
 
-  public RootAppView() {
+  private final SecurityAdapter securityAdapter;
+
+  public RootAppView(SecurityAdapter securityAdapter) {
+    this.securityAdapter = securityAdapter;
     H1 appTitle = new H1("Camunda Pilot");
     appTitle
         .getStyle()
@@ -43,7 +50,8 @@ public class RootAppView extends AppLayout {
     HorizontalLayout subViews = getSecondaryNavigation();
     subViews.getElement();
 
-    HorizontalLayout wrapper = new HorizontalLayout(toggle, viewTitle);
+    HorizontalLayout wrapper =
+        new HorizontalLayout(toggle, viewTitle, new UserMenuBar(securityAdapter));
     wrapper.setAlignItems(FlexComponent.Alignment.CENTER);
     wrapper.setSpacing(false);
 

@@ -7,7 +7,7 @@ keycloak = "23.0.4"
 lombok = "1.18.30"
 spotbugs-annotations = "4.8.3"
 spotbugs-gradle-plugin = "6.0.6"
-spring-boot = "3.1.7"
+spring-boot = "3.1.8"
 vaadin = "24.3.3"
 
 [libraries]
