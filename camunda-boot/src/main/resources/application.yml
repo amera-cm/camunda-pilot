@@ -1,0 +1,45 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: camunda-pilot
+            authorization-grant-type: authorization_code
+            scope:
+              - openid
+            client-secret: <set as env var SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENTSECRET>
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/nukleus
+
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/nukleus
+
+camunda:
+  bpm:
+    filter:
+      create: All tasks
+    webapp:
+      application-path: /camunda
+      index-redirect-enabled: false
+    process-engine-name: camundaPilotProcEng
+    database:
+      schema-update: true
+      type: postgres
+
+camunda-plugins:
+  keycloak:
+    keycloakIssuerUrl: http://localhost:8180/realms/nukleus
+    keycloakAdminUrl: http://localhost:8180/admin/realms/nukleus
+    clientId: camunda-pilot
+    clientSecret: <set as env var CAMUNDAPLUGINS_KEYCLOAK_CLIENTSECRET>
+
+jdbc:
+  datasources:
+    camunda-pilot-proc-eng:
+      url: jdbc:postgresql://localhost:5432/camunda_pilot_proc_eng
+      username: postgres
+      password: <set-as-env-var>
+      driver-class-name: org.postgresql.Driver
