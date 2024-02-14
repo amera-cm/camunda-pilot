@@ -1,5 +1,9 @@
 package io.cmt.camunda_pilot.camunda.boot.spring.cfg;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
+import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
+import com.vaadin.flow.spring.security.VaadinWebSecurity;
 import io.cmt.camunda_pilot.camunda.boot.spring.security.KcLogoutHandler;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,13 +20,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 /** Spring Security Config. */
@@ -30,9 +34,9 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 @ComponentScan(basePackageClasses = {KcLogoutHandler.class})
 @EnableWebSecurity
 @ParametersAreNonnullByDefault
-public class SecurityConfig {
+public class CamundaBootSecurityConfig extends VaadinWebSecurity {
 
-  private static final Logger logger = LogManager.getLogger(SecurityConfig.class);
+  private static final Logger logger = LogManager.getLogger(CamundaBootSecurityConfig.class);
 
   private static final String REALM_ACCESS_CLAIM = "realm_access";
   private static final String ROLES_CLAIM = "roles";
@@ -40,25 +44,36 @@ public class SecurityConfig {
 
   @Nonnull private final LogoutHandler logoutHandler;
 
-  public SecurityConfig(LogoutHandler logoutHandler) {
+  public CamundaBootSecurityConfig(LogoutHandler logoutHandler) {
     this.logoutHandler = logoutHandler;
   }
 
   @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.authorizeHttpRequests(
-            authorize ->
-                authorize
-                    .requestMatchers("/", "/public/**")
+  public static NavigationAccessControlConfigurer navigationAccessControlConfigurer() {
+    return new NavigationAccessControlConfigurer().withAnnotatedViewAccessChecker();
+  }
+
+  @Bean
+  public static GrantedAuthorityDefaults grantedAuthorityDefaults() {
+    return new GrantedAuthorityDefaults(""); // Remove the ROLE_ prefix
+  }
+
+  @Override
+  protected void configure(HttpSecurity http) throws Exception {
+    http.csrf(
+            csrf ->
+                csrf.ignoringRequestMatchers(
+                    antMatcher("/camunda/api/**"), antMatcher("/camunda/engine-rest/**")))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers("/", "/logout")
                     .permitAll()
                     .requestMatchers("/camunda/**")
-                    .hasAuthority("SUPERUSER")
-                    .anyRequest()
-                    .authenticated())
+                    .hasAuthority("SUPERUSER"))
         .oauth2ResourceServer(cfg -> cfg.jwt(Customizer.withDefaults()))
-        .oauth2Login(Customizer.withDefaults())
-        .logout(logout -> logout.addLogoutHandler(logoutHandler).logoutSuccessUrl("/"));
-    return http.build();
+        .oauth2Login(Customizer.withDefaults());
+    super.configure(http);
+    setOAuth2LoginPage(http, "/oauth2/authorization/keycloak");
   }
 
   @Bean

@@ -25,9 +25,11 @@ camunda:
       application-path: /camunda
       index-redirect-enabled: false
     process-engine-name: camundaPilotProcEng
-    database:
-      schema-update: true
-      type: postgres
+#    database:
+#      schema-update: true
+#      type: postgres
+    authorization:
+      enabled: false
 
 camunda-plugins:
   keycloak:
@@ -35,6 +37,7 @@ camunda-plugins:
     keycloakAdminUrl: http://localhost:8180/admin/realms/nukleus
     clientId: camunda-pilot
     clientSecret: <set as env var CAMUNDAPLUGINS_KEYCLOAK_CLIENTSECRET>
+    authorizationCheckEnabled: false
 
 jdbc:
   datasources:
@@ -43,3 +46,6 @@ jdbc:
       username: postgres
       password: <set-as-env-var>
       driver-class-name: org.postgresql.Driver
+
+vaadin:
+  url-mapping: /ui/*

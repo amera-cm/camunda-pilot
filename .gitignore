@@ -12,3 +12,5 @@ node_modules/
 boot-ui/frontend/generated/
 pnpmfile.js
 vite.generated.ts
+
+camunda-boot/frontend/generated/
