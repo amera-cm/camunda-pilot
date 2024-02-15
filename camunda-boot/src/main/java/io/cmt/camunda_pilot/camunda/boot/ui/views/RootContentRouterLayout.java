@@ -7,4 +7,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParentLayout(RootAppView.class)
 @ParametersAreNonnullByDefault
-public class RootContentRouterLayout extends Div implements RouterLayout {}
+public class RootContentRouterLayout extends Div implements RouterLayout {
+  public RootContentRouterLayout() {
+    setSizeFull();
+  }
+}

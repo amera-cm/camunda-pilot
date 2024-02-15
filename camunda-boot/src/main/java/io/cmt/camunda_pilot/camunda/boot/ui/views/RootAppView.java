@@ -20,6 +20,8 @@ import io.cmt.camunda_pilot.camunda.boot.ui.adapters.SecurityUiAdapter;
 import io.cmt.camunda_pilot.camunda.boot.ui.components.MySideNavItem;
 import io.cmt.camunda_pilot.camunda.boot.ui.components.RootHeadViewTitle;
 import io.cmt.camunda_pilot.camunda.boot.ui.components.UserMenuBar;
+import io.cmt.camunda_pilot.camunda.boot.ui.views.processes.ProcessInstancesView;
+import io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.MyTasksView;
 import jakarta.annotation.security.PermitAll;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,11 +48,6 @@ public class RootAppView extends AppLayout {
     Scroller scroller = new Scroller(views);
     scroller.setClassName(LumoUtility.Padding.SMALL);
 
-    //    HorizontalLayout subViews = getSecondaryNavigation();
-    //    subViews.getElement();
-
-    //    VerticalLayout viewHeader = new VerticalLayout(wrapper, subViews);
-
     addToDrawer(appTitle, scroller);
     addToNavbar(topNavBar());
 
@@ -76,10 +73,7 @@ public class RootAppView extends AppLayout {
     hlayout.setSpacing(false);
     hlayout.expand(userMenuWrapper);
     hlayout.setWidthFull();
-    //
-    //    VerticalLayout viewHeader = new VerticalLayout(wrapper);
-    //    viewHeader.setPadding(false);
-    //    viewHeader.setSpacing(false);
+
     return hlayout;
   }
 
@@ -87,12 +81,12 @@ public class RootAppView extends AppLayout {
     SideNav sideNav = new SideNav();
     sideNav.addItem(
         createSideNavItem("Home", HomeUserView.class, VaadinIcon.HOME.create()),
-        createSideNavItem("Dashboard", "/dashboard", VaadinIcon.DASHBOARD.create()),
+        createSideNavItem("Tasks", MyTasksView.class, VaadinIcon.LIST.create()),
+        createSideNavItem("Process", ProcessInstancesView.class, VaadinIcon.COGS.create()),
         createSideNavItem("Orders", "/orders", VaadinIcon.CART.create()),
         createSideNavItem("Customers", "/customers", VaadinIcon.USER_HEART.create()),
         createSideNavItem("Products", "/products", VaadinIcon.PACKAGE.create()),
         createSideNavItem("Documents", "/documents", VaadinIcon.RECORDS.create()),
-        createSideNavItem("Tasks", "/tasks", VaadinIcon.LIST.create()),
         createSideNavItem(
             "Camunda Apps", "http://localhost:8080/camunda/app/", VaadinIcon.CHART.create()));
     return sideNav;

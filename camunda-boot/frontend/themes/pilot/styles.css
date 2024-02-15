@@ -12,3 +12,11 @@ vaadin-side-nav-item.highlight::part(content) {
 vaadin-side-nav-item.highlight vaadin-icon {
     color: var(--vaadin-selection-color-text, var(--lumo-primary-text-color));
 }
+
+vaadin-vertical-layout.emptyTaskFormPanel {
+    background-color: var(--lumo-contrast-5pct);
+}
+
+vaadin-vertical-layout.emptyTaskFormPanel h3 {
+    color: var(--lumo-contrast-30pct);
+}
