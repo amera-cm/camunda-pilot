@@ -25,11 +25,15 @@ camunda:
       application-path: /camunda
       index-redirect-enabled: false
     process-engine-name: camundaPilotProcEng
-#    database:
-#      schema-update: true
-#      type: postgres
+    database:
+      schema-update: true
+      type: postgres
     authorization:
       enabled: false
+    generic-properties:
+      properties:
+        historyTimeToLive: P36500D # 100 Years ???
+        enforceHistoryTimeToLive: false
 
 camunda-plugins:
   keycloak:
@@ -38,6 +42,11 @@ camunda-plugins:
     clientId: camunda-pilot
     clientSecret: <set as env var CAMUNDAPLUGINS_KEYCLOAK_CLIENTSECRET>
     authorizationCheckEnabled: false
+
+keycloak:
+  admin-client:
+    realm: nukleus
+    authServerUrl: http://localhost:8180
 
 jdbc:
   datasources:

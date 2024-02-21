@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0ed9mm6" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:process id="tradeProposal" name="Trade proposal" isExecutable="true" camunda:historyTimeToLive="null">
+    <bpmn:startEvent id="StartEvent_1" name="Trade acknowledged">
+      <bpmn:outgoing>Flow_06yi9og</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_08vh2fa" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_1b84em0" name="Create proposal">
+      <bpmn:incoming>Flow_06yi9og</bpmn:incoming>
+      <bpmn:outgoing>Flow_1sw5edv</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:intermediateThrowEvent id="Event_1f50lv4" name="Trade proposal created">
+      <bpmn:incoming>Flow_1sw5edv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wdit7u</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:userTask id="setTradeProposalAcceptanceStatus" name="Set trade proposal acceptance status">
+      <bpmn:incoming>Flow_1wdit7u</bpmn:incoming>
+      <bpmn:outgoing>Flow_1i4i48t</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_1qiejk3" name="Acceptance status?">
+      <bpmn:incoming>Flow_1i4i48t</bpmn:incoming>
+      <bpmn:outgoing>Flow_0fwdtyh</bpmn:outgoing>
+      <bpmn:outgoing>Flow_14w14ac</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="Event_1bx91s3" name="Trade proposal accepted">
+      <bpmn:extensionElements />
+      <bpmn:incoming>Flow_0fwdtyh</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0z1id1q" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="Event_0gvtngx" name="Trade proposal rejected">
+      <bpmn:incoming>Flow_14w14ac</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_06yi9og" sourceRef="StartEvent_1" targetRef="Activity_1b84em0" />
+    <bpmn:sequenceFlow id="Flow_1sw5edv" sourceRef="Activity_1b84em0" targetRef="Event_1f50lv4" />
+    <bpmn:sequenceFlow id="Flow_1wdit7u" sourceRef="Event_1f50lv4" targetRef="setTradeProposalAcceptanceStatus" />
+    <bpmn:sequenceFlow id="Flow_1i4i48t" sourceRef="setTradeProposalAcceptanceStatus" targetRef="Gateway_1qiejk3" />
+    <bpmn:sequenceFlow id="Flow_0fwdtyh" name="accepted" sourceRef="Gateway_1qiejk3" targetRef="Event_1bx91s3" />
+    <bpmn:sequenceFlow id="Flow_14w14ac" name="rejected" sourceRef="Gateway_1qiejk3" targetRef="Event_0gvtngx" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="tradeProposal">
+      <bpmndi:BPMNShape id="Event_1eemonh_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="139" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="162" y="182" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0vpjwwx_di" bpmnElement="Activity_1b84em0">
+        <dc:Bounds x="300" y="117" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0rckr5q_di" bpmnElement="setTradeProposalAcceptanceStatus">
+        <dc:Bounds x="610" y="117" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1f50lv4_di" bpmnElement="Event_1f50lv4">
+        <dc:Bounds x="482" y="139" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="463" y="182" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1qiejk3_di" bpmnElement="Gateway_1qiejk3" isMarkerVisible="true">
+        <dc:Bounds x="795" y="132" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="791" y="76" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0crww11_di" bpmnElement="Event_1bx91s3">
+        <dc:Bounds x="942" y="139" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="923" y="182" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0gvtngx_di" bpmnElement="Event_0gvtngx">
+        <dc:Bounds x="942" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="923" y="305" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_06yi9og_di" bpmnElement="Flow_06yi9og">
+        <di:waypoint x="215" y="157" />
+        <di:waypoint x="300" y="157" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1sw5edv_di" bpmnElement="Flow_1sw5edv">
+        <di:waypoint x="400" y="157" />
+        <di:waypoint x="482" y="157" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wdit7u_di" bpmnElement="Flow_1wdit7u">
+        <di:waypoint x="518" y="157" />
+        <di:waypoint x="610" y="157" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1i4i48t_di" bpmnElement="Flow_1i4i48t">
+        <di:waypoint x="710" y="157" />
+        <di:waypoint x="795" y="157" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fwdtyh_di" bpmnElement="Flow_0fwdtyh">
+        <di:waypoint x="845" y="157" />
+        <di:waypoint x="942" y="157" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="857" y="133" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14w14ac_di" bpmnElement="Flow_14w14ac">
+        <di:waypoint x="820" y="182" />
+        <di:waypoint x="820" y="280" />
+        <di:waypoint x="942" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="830" y="203" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

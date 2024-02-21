@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.camunda.keycloak.plugin)
     implementation(libs.camunda.springboot.starter)
     implementation(libs.camunda.springboot.starter.webapp)
+    implementation(libs.keycloak.adminClient)
     implementation(platform(libs.vaadin.bom))
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")

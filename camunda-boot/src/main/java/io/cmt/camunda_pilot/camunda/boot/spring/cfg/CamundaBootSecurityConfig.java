@@ -24,8 +24,6 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
@@ -74,11 +72,6 @@ public class CamundaBootSecurityConfig extends VaadinWebSecurity {
         .oauth2Login(Customizer.withDefaults());
     super.configure(http);
     setOAuth2LoginPage(http, "/oauth2/authorization/keycloak");
-  }
-
-  @Bean
-  public ClientRegistration keycloakClientRegistration(ClientRegistrationRepository repo) {
-    return repo.findByRegistrationId("keycloak");
   }
 
   @SuppressWarnings("unchecked")

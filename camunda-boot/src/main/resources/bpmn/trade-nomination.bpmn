@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_188057q" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.20.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.20.0">
+  <bpmn:process id="tradeNomination" name="Trade Nomination" isExecutable="true">
+    <bpmn:documentation>Set-up the trade nomination data</bpmn:documentation>
+    <bpmn:startEvent id="StartEvent_1" name="Trade requested" camunda:asyncBefore="true">
+      <bpmn:outgoing>Flow_1x04y33</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0flqmb9" messageRef="Message_1raq5ta" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="setupNomination" name="Set-up nomination">
+      <bpmn:documentation>Set-up the trade's nomination data</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:taskListener delegateExpression="${defaultTaskCreateListener}" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1x04y33</bpmn:incoming>
+      <bpmn:outgoing>Flow_0n4muxz</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:intermediateThrowEvent id="Event_0rbl77e" name="Nomination created">
+      <bpmn:incoming>Flow_0n4muxz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1e80ojl</bpmn:outgoing>
+    </bpmn:intermediateThrowEvent>
+    <bpmn:userTask id="setNominationApprovalStatus" name="Set nomination approval status">
+      <bpmn:documentation>Set the trade's nomination approval status</bpmn:documentation>
+      <bpmn:extensionElements>
+        <camunda:taskListener delegateExpression="${defaultTaskCreateListener}" event="create" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1e80ojl</bpmn:incoming>
+      <bpmn:outgoing>Flow_11cgx11</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_1whd902" name="Nomination approval status?">
+      <bpmn:incoming>Flow_11cgx11</bpmn:incoming>
+      <bpmn:outgoing>Flow_135bl3p</bpmn:outgoing>
+      <bpmn:outgoing>Flow_186zyd3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="tradeCreated" name="Trade created">
+      <bpmn:incoming>Flow_0j824q0</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1d51iaf" camunda:delegateExpression="${defaultEventThrowDelegate}" />
+    </bpmn:endEvent>
+    <bpmn:sendTask id="notifyNominationRejection" name="Notify nomination rejection" camunda:delegateExpression="${defaultServiceTaskDelegate}">
+      <bpmn:incoming>Flow_186zyd3</bpmn:incoming>
+      <bpmn:outgoing>Flow_07qi4ti</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="Event_182swwf" name="Nomination rejected">
+      <bpmn:incoming>Flow_07qi4ti</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_135bl3p" name="approved" sourceRef="Gateway_1whd902" targetRef="createTrade">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nominationApprovalStatus == 'approved'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_186zyd3" name="rejected" sourceRef="Gateway_1whd902" targetRef="notifyNominationRejection">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${nominationApprovalStatus == 'rejected'}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1x04y33" sourceRef="StartEvent_1" targetRef="setupNomination" />
+    <bpmn:sequenceFlow id="Flow_0n4muxz" sourceRef="setupNomination" targetRef="Event_0rbl77e" />
+    <bpmn:sequenceFlow id="Flow_1e80ojl" sourceRef="Event_0rbl77e" targetRef="setNominationApprovalStatus" />
+    <bpmn:sequenceFlow id="Flow_11cgx11" sourceRef="setNominationApprovalStatus" targetRef="Gateway_1whd902" />
+    <bpmn:sequenceFlow id="Flow_07qi4ti" sourceRef="notifyNominationRejection" targetRef="Event_182swwf" />
+    <bpmn:sequenceFlow id="Flow_0j824q0" sourceRef="createTrade" targetRef="tradeCreated" />
+    <bpmn:serviceTask id="createTrade" name="Create trade" camunda:delegateExpression="${defaultServiceTaskDelegate}">
+      <bpmn:incoming>Flow_135bl3p</bpmn:incoming>
+      <bpmn:outgoing>Flow_0j824q0</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:message id="Message_1raq5ta" name="tradeRequested" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="tradeNomination">
+      <bpmndi:BPMNShape id="Event_0tu2upy_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="129" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="157" y="172" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1fincqw_di" bpmnElement="setupNomination">
+        <dc:Bounds x="330" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0rbl77e_di" bpmnElement="Event_0rbl77e">
+        <dc:Bounds x="522" y="129" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="512" y="172" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0g3o09u_di" bpmnElement="setNominationApprovalStatus">
+        <dc:Bounds x="650" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1whd902_di" bpmnElement="Gateway_1whd902" isMarkerVisible="true">
+        <dc:Bounds x="835" y="122" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="819" y="76" width="81" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_08oselc_di" bpmnElement="tradeCreated">
+        <dc:Bounds x="1182" y="129" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1166" y="172" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1xu0tuw_di" bpmnElement="notifyNominationRejection">
+        <dc:Bounds x="980" y="260" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_182swwf_di" bpmnElement="Event_182swwf">
+        <dc:Bounds x="1182" y="282" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1172" y="325" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_13o5v2m_di" bpmnElement="createTrade">
+        <dc:Bounds x="980" y="107" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_135bl3p_di" bpmnElement="Flow_135bl3p">
+        <di:waypoint x="885" y="147" />
+        <di:waypoint x="980" y="147" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="886" y="129" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_186zyd3_di" bpmnElement="Flow_186zyd3">
+        <di:waypoint x="860" y="172" />
+        <di:waypoint x="860" y="300" />
+        <di:waypoint x="980" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="870" y="203" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1x04y33_di" bpmnElement="Flow_1x04y33">
+        <di:waypoint x="215" y="147" />
+        <di:waypoint x="330" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0n4muxz_di" bpmnElement="Flow_0n4muxz">
+        <di:waypoint x="430" y="147" />
+        <di:waypoint x="522" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1e80ojl_di" bpmnElement="Flow_1e80ojl">
+        <di:waypoint x="558" y="147" />
+        <di:waypoint x="650" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11cgx11_di" bpmnElement="Flow_11cgx11">
+        <di:waypoint x="750" y="147" />
+        <di:waypoint x="835" y="147" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07qi4ti_di" bpmnElement="Flow_07qi4ti">
+        <di:waypoint x="1080" y="300" />
+        <di:waypoint x="1182" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j824q0_di" bpmnElement="Flow_0j824q0">
+        <di:waypoint x="1080" y="147" />
+        <di:waypoint x="1182" y="147" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -10,12 +10,15 @@ import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import io.cmt.camunda_pilot.camunda.boot.events.model.TradeRequestedEvent;
 import io.cmt.camunda_pilot.camunda.boot.ui.adapters.ProcessEngUiAdapter;
 import io.cmt.camunda_pilot.camunda.boot.ui.adapters.SecurityUiAdapter;
 import io.cmt.camunda_pilot.camunda.boot.ui.mixins.WithViewTitle;
@@ -25,6 +28,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.ApplicationEventPublisher;
 
 @RolesAllowed("USER")
 @Route(value = "definitions", layout = ProcessTabsRouterLayout.class)
@@ -34,12 +38,20 @@ public class ProcessDefinitionsView extends VerticalLayout implements WithViewTi
 
   private final ProcessEngUiAdapter processEng;
   private final SecurityUiAdapter securityAdapter;
+  private final ApplicationEventPublisher eventPublisher;
 
-  public ProcessDefinitionsView(ProcessEngUiAdapter processEng, SecurityUiAdapter securityAdapter) {
+  public ProcessDefinitionsView(
+      ProcessEngUiAdapter processEng,
+      SecurityUiAdapter securityAdapter,
+      ApplicationEventPublisher eventPublisher) {
     this.processEng = processEng;
     this.securityAdapter = securityAdapter;
+    this.eventPublisher = eventPublisher;
     final var h2 = new H2(getViewTitle());
     add(h2);
+
+    final var menuBar = createMenuBar();
+    add(menuBar);
 
     final var grid = new Grid<>(ProcessDef.class, false);
     setupGrid(grid);
@@ -54,6 +66,20 @@ public class ProcessDefinitionsView extends VerticalLayout implements WithViewTi
               dialog.open();
             });
     start.addComponentAsFirst(createIcon(VaadinIcon.START_COG));
+  }
+
+  private MenuBar createMenuBar() {
+    final var menuBar = new MenuBar();
+    menuBar.addThemeVariants(MenuBarVariant.LUMO_END_ALIGNED);
+
+    menuBar.addItem(
+        "Publish a trade requested event",
+        e -> {
+          eventPublisher.publishEvent(new TradeRequestedEvent());
+          showSuccess("Event published!");
+        });
+
+    return menuBar;
   }
 
   private static Component createIcon(VaadinIcon vaadinIcon) {

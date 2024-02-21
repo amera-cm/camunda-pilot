@@ -22,6 +22,7 @@ import io.cmt.camunda_pilot.camunda.boot.ui.adapters.ProcessEngUiAdapter;
 import io.cmt.camunda_pilot.camunda.boot.ui.adapters.SecurityUiAdapter;
 import io.cmt.camunda_pilot.camunda.boot.ui.mixins.WithViewTitle;
 import io.cmt.camunda_pilot.camunda.boot.ui.model.ProcessTask;
+import io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.forms.FormFactoryFinder;
 import jakarta.annotation.security.RolesAllowed;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 
 @RolesAllowed("USER")
 @Route(value = "my", layout = TasksTabsRouterLayout.class)
@@ -41,14 +43,19 @@ public class MyTasksView extends SplitLayout implements WithViewTitle {
 
   private final ProcessEngUiAdapter processEng;
   private final SecurityUiAdapter securityAdapter;
+  private final ApplicationContext applicationContext;
 
   private final Grid<ProcessTask> grid;
   private final VerticalLayout taskListPanel;
   private final VerticalLayout emptyTaskFormPanel;
 
-  public MyTasksView(ProcessEngUiAdapter processEng, SecurityUiAdapter securityAdapter) {
+  public MyTasksView(
+      ProcessEngUiAdapter processEng,
+      SecurityUiAdapter securityAdapter,
+      ApplicationContext applicationContext) {
     this.processEng = processEng;
     this.securityAdapter = securityAdapter;
+    this.applicationContext = applicationContext;
     this.grid = new Grid<>(ProcessTask.class, false);
     this.taskListPanel = createTaskListPanel();
     this.emptyTaskFormPanel = createEmptyTaskFormPanel();
@@ -108,14 +115,29 @@ public class MyTasksView extends SplitLayout implements WithViewTitle {
 
   private void updateTaskFormPanel(@Nullable ProcessTask task) {
     if (task != null) {
-      addToSecondary(createTaskFormPanel(task));
+      final var finder = new FormFactoryFinder();
+      final var factory = finder.find(task.getProcessDefinitionKey(), task.getTaskDefinitionKey());
+      if (factory != null) {
+        final var form =
+            factory.create(
+                task,
+                applicationContext,
+                (v) -> {
+                  grid.deselectAll();
+                  updateGridData();
+                  return null;
+                });
+        addToSecondary(form);
+      } else {
+        addToSecondary(createDefaultTaskFormPanel(task));
+      }
     } else {
       addToSecondary(emptyTaskFormPanel);
     }
     setSplitterPosition(70);
   }
 
-  private VerticalLayout createTaskFormPanel(ProcessTask task) {
+  private VerticalLayout createDefaultTaskFormPanel(ProcessTask task) {
     final var layout = new VerticalLayout();
     layout.addClassName("taskFormPanel");
     layout.add(new H3(task.getName()));
