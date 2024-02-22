@@ -18,6 +18,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import io.cmt.camunda_pilot.camunda.boot.events.model.RejectTradeEventCmd;
 import io.cmt.camunda_pilot.camunda.boot.events.model.TradeRequestedEvent;
 import io.cmt.camunda_pilot.camunda.boot.ui.adapters.ProcessEngUiAdapter;
 import io.cmt.camunda_pilot.camunda.boot.ui.adapters.SecurityUiAdapter;
@@ -77,6 +78,20 @@ public class ProcessDefinitionsView extends VerticalLayout implements WithViewTi
         e -> {
           eventPublisher.publishEvent(new TradeRequestedEvent());
           showSuccess("Event published!");
+        });
+
+    menuBar.addItem(
+        "Reject trade",
+        e -> {
+          eventPublisher.publishEvent(new RejectTradeEventCmd());
+          showSuccess("Command sent!");
+        });
+
+    menuBar.addItem(
+        "Add capacity $100k",
+        e -> {
+          processEng.addCapacity(100_000D);
+          showSuccess("Capacity updated!");
         });
 
     return menuBar;

@@ -1,5 +1,6 @@
 package io.cmt.camunda_pilot.camunda.boot.ui.adapters;
 
+import io.cmt.camunda_pilot.camunda.boot.ops.TradesOps;
 import java.util.List;
 import java.util.Map;
 import org.camunda.bpm.engine.HistoryService;
@@ -19,16 +20,19 @@ public class ProcessEngUiAdapter {
   private final RuntimeService runtimeService;
   private final HistoryService historyService;
   private final TaskService taskService;
+  private final TradesOps tradesOps;
 
   public ProcessEngUiAdapter(
       RepositoryService repositoryService,
       RuntimeService runtimeService,
       HistoryService historyService,
-      TaskService taskService) {
+      TaskService taskService,
+      TradesOps tradesOps) {
     this.repositoryService = repositoryService;
     this.runtimeService = runtimeService;
     this.historyService = historyService;
     this.taskService = taskService;
+    this.tradesOps = tradesOps;
   }
 
   public List<ProcessDefinition> processDefinitions() {
@@ -77,5 +81,9 @@ public class ProcessEngUiAdapter {
 
   public void completeTask(String taskId, Map<String, Object> variables) {
     taskService.complete(taskId, variables);
+  }
+
+  public void addCapacity(Double capacity) {
+    tradesOps.addCapacity(capacity);
   }
 }

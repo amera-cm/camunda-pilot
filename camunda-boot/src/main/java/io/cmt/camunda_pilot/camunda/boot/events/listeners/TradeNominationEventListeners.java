@@ -45,5 +45,21 @@ public class TradeNominationEventListeners {
   public void handleTradeCreatedEvent(TradeCreatedEvent event) {
     logger.debug(() -> "TradeNominationEventListeners::handleTradeCreatedEvent");
     logger.debug(() -> "Received trade created event with tradeId: " + event.getTradeId());
+    final var variables =
+        Map.<String, Object>of(
+            TradesOps.TRADE_STATUS_VAR_KEY, event.getTradeStatus().value(),
+            TradesOps.TRADE_ID_VAR_KEY, event.getTradeId(),
+            TradesOps.NOMINATION_AMOUNT_VAR_KEY, event.getNominationAmount(),
+            TradesOps.ASSETS_COUNT_VAR_KEY, event.getAssetsCount(),
+            TradesOps.NOMINATION_APPROVAL_STATUS_VAR_KEY,
+                event.getNominationApprovalStatus().value());
+    final var instance =
+        runtimeService
+            .createMessageCorrelation(event.getMessageName())
+            .processInstanceBusinessKey(event.getTradeId())
+            .setVariables(variables)
+            .startMessageOnly()
+            .correlateStartMessage();
+    logger.debug(() -> "Process instance created: " + instance.getId());
   }
 }

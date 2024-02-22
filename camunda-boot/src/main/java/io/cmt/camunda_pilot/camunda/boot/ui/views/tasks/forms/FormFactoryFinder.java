@@ -1,5 +1,7 @@
 package io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.forms;
 
+import io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.forms.trade_acknowledge.SetTradeAcknowledgeStatusFormFactory;
+import io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.forms.trade_acknowledge.SetupTradeFormFactory;
 import io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.forms.trade_nomination.SetNominationApprovalStatusFormFactory;
 import io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.forms.trade_nomination.SetupNominationFormFactory;
 import java.util.HashMap;
@@ -31,6 +33,8 @@ public final class FormFactoryFinder {
   private void initFactories() {
     register(new SetupNominationFormFactory());
     register(new SetNominationApprovalStatusFormFactory());
+    register(new SetupTradeFormFactory());
+    register(new SetTradeAcknowledgeStatusFormFactory());
   }
 
   private void register(FormFactory formFactory) {
