@@ -14,13 +14,12 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import io.cmt.camunda_pilot.camunda.boot.ops.TradeNominationUserTasksOps;
 import io.cmt.camunda_pilot.camunda.boot.ops.UserTaskCmd;
 import io.cmt.camunda_pilot.camunda.boot.ui.model.ProcessTask;
+import io.cmt.camunda_pilot.camunda.boot.ui.views.tasks.forms.UserTaskFormPanel;
 import java.util.Optional;
-import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import org.camunda.bpm.engine.TaskService;
@@ -39,13 +38,12 @@ public class SetupNominationFormFactory extends BaseTradeNominationFormFactory {
 
   @Nonnull
   @Override
-  public Component create(
-      Object payload, ApplicationContext applicationContext, Function<Void, Void> afterCompleteFn) {
+  public UserTaskFormPanel create(Object payload, ApplicationContext applicationContext) {
     final var task = (ProcessTask) payload;
     final var taskService = applicationContext.getBean(TaskService.class);
     final var userTasksOps = applicationContext.getBean(TradeNominationUserTasksOps.class);
 
-    final var layout = new VerticalLayout();
+    final var layout = new UserTaskFormPanel();
     layout.addClassName("taskFormPanel");
     layout.add(new H3(task.getName()));
     layout.add(new Paragraph(task.getProcessDefinitionName()));
@@ -77,11 +75,10 @@ public class SetupNominationFormFactory extends BaseTradeNominationFormFactory {
     final var buttonsLayout = new HorizontalLayout();
     final var save = new Button("Save");
     save.addClickListener(
-        saveListener(amount, assetsCount, task, userTasksOps, UserTaskCmd.SAVE, afterCompleteFn));
+        saveListener(amount, assetsCount, task, userTasksOps, UserTaskCmd.SAVE, layout));
     final var complete = new Button("Complete");
     complete.addClickListener(
-        saveListener(
-            amount, assetsCount, task, userTasksOps, UserTaskCmd.COMPLETE, afterCompleteFn));
+        saveListener(amount, assetsCount, task, userTasksOps, UserTaskCmd.COMPLETE, layout));
     complete.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
     buttonsLayout.add(complete, save);
@@ -97,7 +94,7 @@ public class SetupNominationFormFactory extends BaseTradeNominationFormFactory {
       ProcessTask task,
       TradeNominationUserTasksOps userTasksOps,
       UserTaskCmd cmd,
-      Function<Void, Void> afterCompleteFn) {
+      UserTaskFormPanel formPanel) {
     return e -> {
       if (amount.isEmpty() || assetsCount.isEmpty()) {
         showWarning("The fields nomination amount and assets count are required.");
@@ -108,8 +105,9 @@ public class SetupNominationFormFactory extends BaseTradeNominationFormFactory {
         if (cmd == UserTaskCmd.SAVE) {
           showSuccess("Task saved.");
         } else if (cmd == UserTaskCmd.COMPLETE) {
-          showSuccess("Task completed.");
-          afterCompleteFn.apply(null);
+          showSuccess("Task completed. (TaskCompletedEvent)");
+          //          afterCompleteFn.apply(null);
+          formPanel.fireTaskCompletedEvent();
         }
       }
     };

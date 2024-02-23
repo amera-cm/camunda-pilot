@@ -118,15 +118,12 @@ public class MyTasksView extends SplitLayout implements WithViewTitle {
       final var finder = new FormFactoryFinder();
       final var factory = finder.find(task.getProcessDefinitionKey(), task.getTaskDefinitionKey());
       if (factory != null) {
-        final var form =
-            factory.create(
-                task,
-                applicationContext,
-                (v) -> {
-                  grid.deselectAll();
-                  updateGridData();
-                  return null;
-                });
+        final var form = factory.create(task, applicationContext);
+        form.addTaskCompletedListener(
+            e -> {
+              grid.deselectAll();
+              updateGridData();
+            });
         addToSecondary(form);
       } else {
         addToSecondary(createDefaultTaskFormPanel(task));
